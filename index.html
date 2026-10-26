@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="泉州三日游攻略 — 可离线打开的大纲版旅游指南" />
+<title>泉州三日游攻略</title>
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --bg-accent: #efe8dc;
+    --ink: #1f1a14;
+    --muted: #6b6358;
+    --line: #ddd4c6;
+    --brand: #b23a2d;
+    --brand-soft: #f3ddd8;
+    --panel: rgba(255, 252, 247, 0.92);
+    --shadow: 0 10px 30px rgba(60, 40, 20, 0.08);
+    --red: #c62828;
+    --blue: #1565c0;
+    --green: #2e7d32;
+    --orange: #ef6c00;
+    --purple: #6a1b9a;
+    --yellow: #f9a825;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #f3e2d4 0%, transparent 55%),
+      radial-gradient(900px 400px at 100% 0%, #e7efe8 0%, transparent 50%),
+      linear-gradient(180deg, #faf7f2 0%, var(--bg) 40%, #f3efe8 100%);
+    min-height: 100vh;
+    line-height: 1.65;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 18px 64px;
+  }
+  header.hero {
+    padding: 28px 22px 22px;
+    border-radius: 18px;
+    background:
+      linear-gradient(135deg, rgba(178, 58, 45, 0.08), transparent 45%),
+      var(--panel);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(178, 58, 45, 0.12);
+    margin-bottom: 18px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--brand);
+    margin-bottom: 8px;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.65rem, 4.5vw, 2.15rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0 14px;
+    margin-bottom: 6px;
+    background: linear-gradient(180deg, rgba(247, 244, 239, 0.96) 60%, rgba(247, 244, 239, 0));
+    backdrop-filter: blur(6px);
+  }
+  .toolbar button {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .toolbar button:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+    background: var(--brand-soft);
+  }
+  .toolbar button:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  .outline {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 10px 8px 16px;
+  }
+  ul.tree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 18px;
+    border-left: 1px dashed rgba(178, 58, 45, 0.18);
+    margin-left: 12px;
+  }
+  li.node {
+    margin: 2px 0;
+  }
+  li.node.is-empty-leaf { display: none; }
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+  .row:hover { background: rgba(178, 58, 45, 0.04); }
+  .toggle {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    padding: 0;
+  }
+  .toggle.leaf {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .content {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+  }
+  li.node[data-level="0"] > .row .content { font-size: 16px; font-weight: 600; }
+  li.node.collapsed > ul { display: none; }
+  .bold { font-weight: 700; }
+  .text-color-red { color: var(--red); }
+  .text-color-blue { color: var(--blue); }
+  .text-color-green { color: var(--green); }
+  .text-color-orange { color: var(--orange); }
+  .text-color-purple { color: var(--purple); }
+  .text-color-yellow { color: var(--yellow); }
+  .note {
+    margin-top: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--bg-accent);
+    border-radius: 8px;
+  }
+  footer {
+    margin-top: 28px;
+    padding: 18px 8px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer a {
+    color: var(--brand);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(178, 58, 45, 0.35);
+  }
+  footer a:hover { border-bottom-color: var(--brand); }
+  .source-badge {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 16px 12px 48px; }
+    header.hero { padding: 20px 16px 16px; }
+    ul.tree ul { padding-left: 12px; margin-left: 8px; }
+    .toolbar button { padding: 7px 11px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">泉州旅游攻略</div>
+      <h1>泉州三日游攻略</h1>
+      <p class="sub">可折叠大纲 · 本地双击即可打开 · 适合手机与电脑浏览</p>
+    </header>
+
+    <div class="toolbar" role="toolbar" aria-label="大纲折叠控制">
+      <button type="button" data-action="expand-all">全部展开</button>
+      <button type="button" data-action="collapse-all">全部收起</button>
+      <button type="button" data-action="level-1">只看一级</button>
+      <button type="button" data-action="level-2">展开到二级</button>
+      <button type="button" data-action="mubu-default">恢复幕布默认折叠</button>
+    </div>
+
+    <main class="outline">
+      <ul class="tree" id="tree"></ul>
+    </main>
+
+    <footer>
+      <div>原始幕布文档：<a href="https://share.mubu.com/doc/2oEgmjDwbme" target="_blank" rel="noopener noreferrer">https://share.mubu.com/doc/2oEgmjDwbme</a></div>
+      <div class="source-badge">数据来源：cache:mubu-raw.json</div>
+    </footer>
+  </div>
+
+  <script id="doc-data" type="application/json">{"title":"泉州三日游攻略","nodes":[{"id":"dWnJGJ0XG8","text":"\u003cspan\u003e海边和古村没有太多遮挡，帽子、防晒霜必备\u003c/span\u003e"},{"id":"2GTZiz9jiE","text":"\u003cspan\u003e穿浅色衣服拍照好看\u003c/span\u003e"},{"id":"Vw5TCgLwEC","text":""},{"id":"EMaK1OGsAn","text":"\u003cspan class=\"bold\"\u003eDay06：老城\u003c/span\u003e","children":[{"id":"zX5wBe9Zzx","text":"\u003cspan class=\"bold\"\u003e14:30–16:20\u003c/span\u003e\u003cspan\u003e【下午唯一片区·庙宇人文】清净寺 → 涂门街 → 通淮关岳庙 → 天后宫（可选）\u003c/span\u003e","collapsed":true,"children":[{"id":"ZuzJXT5nXz","text":"\u003cspan\u003e拍石构、红砖、庙宇空镜\u003c/span\u003e"},{"id":"Yfsayl2SPw","text":""},{"id":"TxYwz6yBDv","text":"\u003cspan\u003e【必选】\u003c/span\u003e"},{"id":"ylAy9KrPHa","text":"\u003cspan class=\"text-color-red\"\u003e清净寺\u003c/span\u003e\u003cspan\u003e（3元门票）：国内最古老伊斯兰石寺，石构很出片\u003c/span\u003e"},{"id":"PtHuMaggsD","text":"\u003cspan\u003e涂门街\u003c/span\u003e"},{"id":"Db1W2wegQm","text":"\u003cspan class=\"text-color-red\"\u003e关岳庙\u003c/span\u003e\u003cspan\u003e：闽南顶级庙宇，剪瓷雕超精美\u003c/span\u003e"},{"id":"Vov2Ux7BgT","text":""},{"id":"rqpirjYqmL","text":"\u003cspan\u003e【可选】\u003c/span\u003e"},{"id":"EK8Lzb7rRi","text":"\u003cspan\u003e天后宫\u003c/span\u003e"},{"id":"kXvvQT2dVj","text":"\u003cspan\u003e承天寺：人少清幽，红墙榕树超好拍\u003c/span\u003e"},{"id":"372M2aG6nC","text":"\u003cspan\u003e府文庙：东南最大孔庙，红墙古建（\u003c/span\u003e\u003cspan class=\"text-color-blue\"\u003e可留晚上\u003c/span\u003e\u003cspan\u003e：看文庙夜景，红墙灯光，人很少，拍照安静好看）\u003c/span\u003e"},{"id":"1ObGZc2d8x","text":""}]},{"id":"smbhO5tPzk","text":"\u003cspan class=\"bold text-color-red\"\u003e16:30 进开元寺\u003c/span\u003e\u003cspan\u003e（17:15 停止入园）\u003c/span\u003e","children":[{"id":"lROCtqGBQj","text":"\u003cspan\u003e提前占位置\u003c/span\u003e"},{"id":"sNMHu3temI","text":"\u003cspan\u003e日落大约&nbsp;17:25–17:35，17:00 后侧光/暖光最好\u003c/span\u003e"},{"id":"ckbb3vIOLZ","text":"\u003cspan\u003e空镜建议：对称拍两塔、廊下框景拍单塔、放生池倒影（视当日水面）、红墙+塔尖\u003c/span\u003e"},{"id":"tJ62ucKVVy","text":"\u003cspan\u003e开元寺院内大榕树下，正面拍东西塔同框\u003c/span\u003e"},{"id":"lRuIflECqB","text":"\u003cspan\u003e机位：大雄宝殿东侧红墙、双塔中间拜庭、古桑旁边\u003c/span\u003e"},{"id":"8vuqOyefQW","text":""}]},{"id":"qkqh1q1anl","text":"\u003cspan class=\"bold\"\u003e18:00–18:15 \u003c/span\u003e\u003cspan\u003e寺门外快速补&nbsp;1–2 张「街景带塔」外景即离开（不顺路逛西街）。\u003c/span\u003e","children":[{"id":"zsBdGDpDNA","text":"\u003cspan\u003e寺外西街的苏廷玉故居门口、西街中段露台咖啡馆（拍双塔全景，避开人群）\u003c/span\u003e"},{"id":"bapvogjiyb","text":"\u003cspan\u003e寺外西街口再补几张「双塔远景/街景带塔」外景（有时比院内更疏朗）\u003c/span\u003e"},{"id":"upBPqzWS0U","text":""},{"id":"aQMAsjm9fZ","text":"\u003cspan\u003e从西门直接出开元寺，就是西街\u003c/span\u003e"},{"id":"2xHIiHegyE","text":""}]},{"id":"IfyiTLbpNs","text":"\u003cspan class=\"bold\"\u003e18:30–19:30&nbsp;\u003c/span\u003e\u003cspan\u003e晚饭：西街/新门街坐店或先吃一点垫胃（见美食）。吃饭不等于逛景点。\u003c/span\u003e","children":[{"id":"0TvKEGsPJ6","text":"\u003cspan class=\"text-color-red\"\u003e西街\u003c/span\u003e\u003cspan\u003e逛吃\u003c/span\u003e"},{"id":"N0DIFjm54U","text":""},{"id":"yz8IrTW1ze","text":"\u003cspan\u003e金鱼巷（安静灯笼巷）\u003c/span\u003e"},{"id":"JMNTQ60bI7","text":"\u003cspan\u003e肃清门广场：灯笼夜景很出片\u003c/span\u003e"},{"id":"AN7p9zB4Ez","text":"\u003cspan\u003e金鱼巷：属于安静小巷，拍灯笼，备选\u003c/span\u003e"},{"id":"NceQyOLZN7","text":"\u003cspan\u003e水门街：晚上很多小吃，本地人常去\u003c/span\u003e"},{"id":"oUTjVwrvZ1","text":""},{"id":"VIyvnKNPLI","text":"\u003cspan\u003e钟楼 + \u003c/span\u003e\u003cspan class=\"text-color-red\"\u003e中山路骑楼\u003c/span\u003e\u003cspan\u003e：打卡钟楼，中山路连片南洋骑楼，傍晚灯光慢慢亮起\u003c/span\u003e"},{"id":"PFPG5UEuu3","text":"\u003cspan\u003e走到中山路拍民国骑楼夜景（更整齐、适合建筑空镜）\u003c/span\u003e"},{"id":"2k3XJm0PNs","text":""},{"id":"syZ5OhgtOD","text":"\u003cspan\u003e夜游府文庙：看文庙夜景，红墙灯光，人很少，拍照安静好看\u003c/span\u003e"},{"id":"psAGuQXH0b","text":""}]}]},{"id":"WTaq1X5TV3","text":""},{"id":"yypM9AW4I3","text":"\u003cspan\u003eDay 07：海防海岸线：\u003c/span\u003e\u003cspan class=\"text-color-red\"\u003e梧林\u003c/span\u003e\u003cspan\u003e → \u003c/span\u003e\u003cspan class=\"text-color-red\"\u003e永宁\u003c/span\u003e\u003cspan\u003e → 午饭 → \u003c/span\u003e\u003cspan class=\"text-color-red\"\u003e洛伽寺\u003c/span\u003e\u003cspan\u003e → 黄金海岸&amp;橘若艺术馆 → \u003c/span\u003e\u003cspan class=\"text-color-red\"\u003e红塔湾\u003c/span\u003e\u003cspan\u003e →&nbsp;回城晚饭\u003c/span\u003e","collapsed":true,"children":[{"id":"MI3ohVeRfQ","text":"\u003cspan\u003e路线逻辑：上午人文古村，中午永宁吃饭，下午洛伽寺 + 黄金海岸，\u003c/span\u003e\u003cspan class=\"bold\"\u003e最后红塔湾待到日落\u003c/span\u003e\u003cspan\u003e，看完日落返程回古城，晚饭在古城吃。\u003c/span\u003e"},{"id":"vxWohpkfSv","text":"\u003cspan\u003e酒店或美团/携程约「石狮海岸一日」或私家网约车司机包天；前一晚定好，约 8:00 酒店门口接。若实在想省：上午梧林+永宁+洛伽寺包半日/拼车，下午海岸再打车——但仍不如全日包车省心\u003c/span\u003e"},{"id":"R7msC26BfZ","text":""},{"id":"fK0niU6R7T","text":"\u003cspan class=\"bold\"\u003e8:00\u003c/span\u003e\u003cspan\u003e 古城出发（40min）\u003c/span\u003e"},{"id":"q6Q3wfLz23","text":"\u003cspan class=\"bold\"\u003e08:50–10:30\u003c/span\u003e\u003cspan\u003e梧林传统村落：1h40min，上午光线柔和，拍照好看\u003c/span\u003e","collapsed":true,"children":[{"id":"Er3KgoZ9M0","text":"\u003cspan\u003e【必选】\u003c/span\u003e"},{"id":"cOrWuu2yZs","text":"\u003cspan class=\"text-color-red\"\u003e闽南小南洋、红砖古厝\u003c/span\u003e"},{"id":"6sXmgr38hc","text":"\u003cspan\u003e【备选】\u003c/span\u003e"},{"id":"htNArocRGV","text":"\u003cspan\u003e巷弄空镜、华侨番仔楼\u003c/span\u003e"},{"id":"edbziN3Zg2","text":""},{"id":"cUjVfJeMN2","text":"\u003cspan\u003e可以租小娘惹服饰（可选），逛巷弄、老榕树、枪楼、西洋楼。穿浅色衣服拍照好看\u003c/span\u003e"},{"id":"0uT3ER91zv","text":"\u003cspan\u003e可以租侨装\u003c/span\u003e"},{"id":"66J229fpKN","text":"\u003cspan\u003e村里咖啡店多，免费。但别泡咖啡馆太久\u003c/span\u003e"},{"id":"zNpJDKGHhd","text":""}]},{"id":"evHdpCbTKI","text":"\u003cspan class=\"bold\"\u003e10:30\u003c/span\u003e\u003cspan\u003e 去永宁古卫城（车程10min）\u003c/span\u003e"},{"id":"439db5t3wz","text":"\u003cspan class=\"bold\"\u003e10:40–11:50\u003c/span\u003e\u003cspan\u003e 永宁古卫城：1h10min\u003c/span\u003e","collapsed":true,"children":[{"id":"bOzhRm5pQ3","text":"\u003cspan\u003e永宁古卫城：可顺路看城墙/城楼与闽南红砖民居\u003c/span\u003e"},{"id":"49imdlKxB2","text":"\u003cspan\u003e城墙、城门、卫城街巷；以拍照+快览为主\u003c/span\u003e"},{"id":"2BvemvYMIV","text":"\u003cspan\u003e古城很小，逛永宁老街、城隍庙、番仔楼\u003c/span\u003e"},{"id":"WVQCmQyEOO","text":"\u003cspan\u003e明代海防古城，600 年历史，老街烟火浓\u003c/span\u003e"},{"id":"4hp88vXI0k","text":""}]},{"id":"nH7tdzGnFY","text":"\u003cspan class=\"bold\"\u003e11:50-13:10\u003c/span\u003e\u003cspan\u003e 吃饭：1h20min\u003c/span\u003e","collapsed":true,"children":[{"id":"wAn1ExUFuo","text":"\u003cspan\u003e午餐直接在这里解决：永宁煎包、芋圆、土笋冻、海蛎羹。不用跑到很远的海鲜店\u003c/span\u003e"},{"id":"jBARaNWZLY","text":"\u003cspan\u003e永宁/石狮海边或永宁古镇内海鲜/本地小吃\u003c/span\u003e"},{"id":"skWCuL5679","text":""}]},{"id":"Iy3OkAvFfL","text":"\u003cspan class=\"bold\"\u003e13:30–14:30 \u003c/span\u003e\u003cspan class=\"bold text-color-red\"\u003e洛伽寺\u003c/span\u003e\u003cspan class=\"bold\"\u003e（1h，海上佛国）\u003c/span\u003e","collapsed":true,"children":[{"id":"6BX46WeII9","text":"\u003cspan\u003e礁石上的海上寺庙，看海天与寺庙结合，适合中短停\u003c/span\u003e"},{"id":"uEysgm9tuk","text":"\u003cspan\u003e海边寺庙，拍海天、廊道、远景即可，不必长时间祈福排队\u003c/span\u003e"},{"id":"H6PdpZiqO6","text":"\u003cspan\u003e洛伽寺涨潮和落景观感差很多！涨潮的时候寺庙像浮在海上，拍照封神；落潮露出大片滩涂，风格不一样\u003c/span\u003e"},{"id":"ni4x6H5Ex6","text":"\u003cspan\u003e提前查当日潮汐，涨潮最佳（最震撼）\u003c/span\u003e"},{"id":"owBEGjn5cC","text":"\u003cspan\u003e洛伽寺、红塔湾看潮汐可以搜小程序【潮汐表精灵】，选晋江深沪湾\u003c/span\u003e"},{"id":"fC11CYy6Ml","text":""}]},{"id":"Ts5zfp65Yu","text":"\u003cspan class=\"bold\"\u003e14:40–15:20 &nbsp;\u003c/span\u003e\u003cspan\u003e黄金海岸（40min，洛伽寺步行可达）：沙滩散步+海边空镜（主沙滩时段放这里）。\u003c/span\u003e","children":[{"id":"nQY1Jp8mnb","text":"\u003cspan\u003e巨大观音雕像，这里是拍洛伽寺全景的机位（短停补角度），沙滩散步，吹海风，短暂休息。\u003c/span\u003e"},{"id":"nC40FA5uzr","text":"\u003cspan\u003e黄金海岸主拍沙滩\u003c/span\u003e"},{"id":"WIDrWBoRwt","text":"\u003cspan\u003e黄金海岸&nbsp;≈ 红塔湾：同属海岸沙滩风光，气质接近，建议「一个主拍、一个路过/短停」\u003c/span\u003e"},{"id":"fOr20mLj8C","text":"\u003cspan class=\"bold\"\u003e橘若\u003c/span\u003e\u003cspan\u003e：就是黄金海岸里的白色城堡打卡点，灯塔、白色建筑，海边文艺机位，适合日落前后。门票单独买（去橘若，可适当延时）\u003c/span\u003e"},{"id":"BvD2mGt6Z9","text":""}]},{"id":"PR2bkMC8La","text":"\u003cspan class=\"bold\"\u003e16:30前\u003c/span\u003e\u003cspan\u003e 去红塔湾，车程15min\u003c/span\u003e"},{"id":"dOKpnptaVn","text":"\u003cspan class=\"bold\"\u003e16:40- 18:30\u003c/span\u003e\u003cspan\u003e \u003c/span\u003e\u003cspan class=\"bold text-color-red\"\u003e红塔湾\u003c/span\u003e\u003cspan\u003e：\u003c/span\u003e\u003cspan class=\"bold\"\u003e红塔湾是整条线最佳日落点\u003c/span\u003e\u003cspan\u003e，专门等橘子海\u003c/span\u003e","children":[{"id":"NMhldMb5Ai","text":"\u003cspan\u003e红塔湾最佳机位：靠南侧礁石灯塔一带\u003c/span\u003e"},{"id":"EBNBESx3eE","text":"\u003cspan\u003e可以坐在沙滩等夕阳，拍海面剪影\u003c/span\u003e"},{"id":"Gu9UuMeqHg","text":"\u003cspan\u003e踩沙滩、礁石拍照，休息，16:30 之后天空慢慢变橘，17:21 日落，日落之后还有蓝调时刻，非常出片。\u003c/span\u003e"},{"id":"EDqytNIyX9","text":"\u003cspan\u003e11 月日落约 17:25–17:35；16:55 到可占位拍暖光→日落→晚霞\u003c/span\u003e"},{"id":"fdzHGLCmGk","text":"\u003cspan\u003e注意潮汐：洛伽寺要涨潮才好看，红塔湾退潮适合赶海\u003c/span\u003e"},{"id":"pLIquKidwS","text":""}]},{"id":"ZchpAoSaCO","text":"\u003cspan class=\"bold\"\u003e18:30\u003c/span\u003e\u003cspan\u003e 返程，车程50min\u003c/span\u003e"},{"id":"e2OK4qkTym","text":""}]},{"id":"kDrA5nBZNo","text":""},{"id":"9ZyvVd9PZ5","text":"\u003cspan\u003eDay 08：蟳埔簪花：退房 → 行李寄存在酒店前台 → 空手去蟳埔村簪花拍照 → 午饭 → 回酒店取行李 → 泉州站返程\u003c/span\u003e","children":[{"id":"ymICTtqDiI","text":"\u003cspan class=\"bold\"\u003e07:40\u003c/span\u003e\u003cspan\u003e 古城酒店出发 → 08:00 抵达蟳埔村（打车约 25 分钟）\u003c/span\u003e","children":[{"id":"kSRPiyHlDH","text":"\u003cspan\u003e越早到人越少，光线柔和，不用排队等阿嬷簪花。导航定位：蟳埔妈祖庙 / 渔人码头停车场，不要定位村口\u003c/span\u003e"},{"id":"TUcori3OuL","text":""}]},{"id":"HgShI966C0","text":"\u003cspan class=\"bold\"\u003e08:10–10:30\u003c/span\u003e\u003cspan\u003e 蟳埔游玩（2h20min）\u003c/span\u003e","children":[{"id":"jCOY3Ef6xY","text":"\u003cspan\u003e关于簪花\u003c/span\u003e","collapsed":true,"children":[{"id":"yaxLuH80Vx","text":"\u003cspan\u003e1、普通套餐 40–60 元（基础簪花 + 一套衣服）；款式更饱满大花盘 80–120；很多店限时 1 小时 / 1.5 小时，超时加价，提前确认时长！\u003c/span\u003e","note":"\u003cspan\u003e巷内本地阿嬷店：基础套餐 40 元 = 簪花 + 传统渔女服装，无隐形消费；精致妆面另加钱，按需选择\u003c/span\u003e"},{"id":"z3rxk49pmk","text":"\u003cspan\u003e2、避开村口网红高价店。不要路边拉客大姐带去偏僻小店：容易低价引流，中途加价（加花、换衣服、卸妆费单独收钱）。优先巷内本地阿嬷店，或 选村口明码标价、墙上贴价目表的门店。\u003c/span\u003e"},{"id":"koYEPXEWQ0","text":"\u003cspan\u003e3、头饰：鲜花是当天新鲜的，拍照好看，但容易蔫；绢花持久，适合拍很久；问清楚是不是鲜花。\u003c/span\u003e"},{"id":"vPnoQTQNME","text":"\u003cspan\u003e4、妆容：很多店只包簪花，化妆单独收费（30–50），提前问；可以自己打好底妆过去。\u003c/span\u003e"},{"id":"7EBl0UXcIR","text":"\u003cspan\u003e5、拍照：店里摄影师是额外收费，50–100 一组；可以自己互拍省下这笔钱。\u003c/span\u003e"},{"id":"HWmgbpQ1a6","text":"\u003cspan\u003e6、服装：蟳埔传统是大裾衫，红色、杏色、蓝色出片；白色很百搭；衣服注意检查有没有污渍。\u003c/span\u003e"},{"id":"Rl9nlXF6i5","text":"\u003cspan\u003e7、时间：周日上午 9–11 点是最高峰，排队巨久！想人少：8:30 前到蟳埔。\u003c/span\u003e"},{"id":"AzDdY1pYOv","text":""}]},{"id":"kAQi29ynRu","text":"\u003cspan\u003e打卡顺序：换装簪花 →蚵壳厝（蚝壳墙，核心打卡点）→顺济宫红墙 →渔村小巷 →渔人码头海边机位\u003c/span\u003e"},{"id":"AbUyDI4u6j","text":"\u003cspan\u003e村内打卡机位\u003c/span\u003e","children":[{"id":"S202RiKlwB","text":"\u003cspan\u003e蟳埔顺济宫（妈祖庙）门口：渔船、蚝壳厝同框（经典机位）\u003c/span\u003e"},{"id":"etzRSJgRnO","text":"\u003cspan\u003e蚝壳厝老巷子：斑驳墙面，一定要找大片蚝壳墙\u003c/span\u003e"},{"id":"wKvObSLDkh","text":"\u003cspan\u003e码头渔船边（渔船码头）：背景大海，氛围感最强\u003c/span\u003e"},{"id":"X2wPCHfm3A","text":"\u003cspan\u003e村口大榕树\u003c/span\u003e"},{"id":"i9bgDwRBlr","text":""}]}]},{"id":"qqZ4IOapsp","text":""},{"id":"wnAG128FoF","text":"\u003cspan\u003e午饭 + 回酒店取行李\u003c/span\u003e"},{"id":"HwjhLe5eAM","text":""},{"id":"eohP0IN06G","text":"\u003cspan class=\"bold\"\u003e13:25–14:00\u003c/span\u003e\u003cspan\u003e 打车去泉州站（预留堵车）：力争 14:00 前到站\u003c/span\u003e"},{"id":"jQOmbLEfGW","text":""},{"id":"zicQDiCAAp","text":"\u003cspan class=\"bold\"\u003e14:46\u003c/span\u003e\u003cspan\u003e 发车\u003c/span\u003e"},{"id":"B1CNmtfvyV","text":""}]},{"id":"lgTIM01afX","text":""},{"id":"WZQwlC5AY4","text":"\u003cspan\u003e美食篇（仅备用）\u003c/span\u003e","children":[{"id":"8DnpkXsdnT","text":"\u003cspan\u003eDay1 美食推荐（按用餐时段）\u003c/span\u003e","children":[{"id":"Qfx6ZPubRm","text":"\u003cspan\u003e【午餐推荐】\u003c/span\u003e","children":[{"id":"moMEiftBJN","text":"\u003cspan\u003e1. \u003c/span\u003e\u003cspan class=\"bold\"\u003e水门国仔面线糊（总店）\u003c/span\u003e","children":[{"id":"rgKE97ABJb","text":"\u003cspan\u003e特色：老牌面线糊，可以加醋肉、大肠、油条；本地人的早餐午餐常客，汤底鲜甜。\u003c/span\u003e"},{"id":"JIpMupyxHL","text":"\u003cspan\u003e理由：离文庙、清净寺不远，顺路，性价比高。\u003c/span\u003e"}]},{"id":"XQfHtr44ZU","text":"\u003cspan\u003e2.&nbsp;\u003c/span\u003e\u003cspan class=\"bold\"\u003e好成财牛排馆（涂门街店）\u003c/span\u003e","collapsed":true,"children":[{"id":"0AYs45mwX2","text":"\u003cspan\u003e特色：咖喱牛排 + 咸饭，牛排软烂，咖喱浓郁。\u003c/span\u003e"},{"id":"PYMapQfznr","text":"\u003cspan\u003e理由：涂门街上，关岳庙隔壁，吃完直接逛清净寺文庙，位置绝佳。\u003c/span\u003e"}]}]},{"id":"EwFO9lwWRq","text":"\u003cspan\u003e【西街小吃（下午边走边吃）】\u003c/span\u003e","children":[{"id":"y3ViRS3XtA","text":"\u003cspan\u003e亚佛润饼皮：润饼卷，薄饼包花生糖、海苔菜丝，甜口经典\u003c/span\u003e"},{"id":"LLFsjmRq0O","text":"\u003cspan\u003e侯阿婆肉粽：烧肉粽，配甜辣酱，泉州招牌\u003c/span\u003e"},{"id":"T1yZ8L87Q9","text":"\u003cspan\u003e土笋冻：尝试选小份，配蒜蓉醋，鲜凉\u003c/span\u003e"}]},{"id":"dmcsVfoWGs","text":"\u003cspan\u003e【晚餐 / 夜宵二选一】\u003c/span\u003e","children":[{"id":"txhEXMMDkh","text":"\u003cspan\u003e1. \u003c/span\u003e\u003cspan class=\"bold\"\u003e斯丹姜母鸭（涂门街店 / 西街店）\u003c/span\u003e","children":[{"id":"FAvJumW2Cg","text":"\u003cspan\u003e特色：麻油老姜焖正番鸭，干香入味，锅气足。\u003c/span\u003e"},{"id":"OwAoDqnW49","text":"\u003cspan\u003e理由：泉州代表菜，适合 3 人一起吃；分店很多，西街店逛完夜景回去顺路。\u003c/span\u003e"}]},{"id":"2btaDPHqD0","text":"\u003cspan\u003e2. \u003c/span\u003e\u003cspan class=\"bold\"\u003e阿彬牛肉火锅（涂门店）\u003c/span\u003e"},{"id":"6ILGyrnacT","text":"\u003cspan\u003e特色：闽南牛肉火锅，吊龙、匙柄，配沙茶酱。\u003c/span\u003e"},{"id":"umkpJQkAna","text":"\u003cspan\u003e理由：想吃清淡鲜口就选这个。\u003c/span\u003e"}]},{"id":"Slae2u6C8h","text":"\u003cspan\u003e避雷：西街主街很多网红小吃溢价高，同款小吃优先选涂门街、水门街老店。\u003c/span\u003e"},{"id":"FdvBGE0geG","text":""}]},{"id":"Gw2kbOKl0l","text":"\u003cspan\u003eDay2 美食推荐（晋江沿海）\u003c/span\u003e","children":[{"id":"ZDDFt5PH07","text":"\u003cspan\u003e【永宁古卫城午餐（优先永宁老街）】\u003c/span\u003e","children":[{"id":"8A1KXwKNMq","text":"\u003cspan\u003e1. \u003c/span\u003e\u003cspan class=\"bold\"\u003e永宁阿潭水煎包\u003c/span\u003e","children":[{"id":"2HIPPfNg96","text":"\u003cspan\u003e特色：水煎包配牛肉汤，皮脆，本地人从小吃到大。\u003c/span\u003e"}]},{"id":"VT1Ch8XEGO","text":"\u003cspan\u003e2.&nbsp;\u003c/span\u003e\u003cspan class=\"bold\"\u003e永宁古卫城芋圆仔\u003c/span\u003e","children":[{"id":"tp5lty4cAl","text":"\u003cspan\u003e特色：手工芋圆，咸口汤底，加海蛎、瘦肉，闽南特色。\u003c/span\u003e"}]},{"id":"HgCjE9P6tJ","text":"\u003cspan\u003e海边餐馆谨慎选海鲜排档，容易溢价；想吃海鲜可以找永宁本地小店，不要在黄金海岸沙滩边上吃。\u003c/span\u003e"}]},{"id":"bh6xw3PXyc","text":"\u003cspan\u003e【沿途加餐】\u003c/span\u003e","children":[{"id":"yydLD2qnyD","text":"\u003cspan\u003e梧林里面有很多南洋风咖啡馆，适合歇脚；红塔湾有小摊卖海蛎煎、炸紫菜。\u003c/span\u003e"}]},{"id":"eC6L85sYkW","text":"\u003cspan\u003e【回到老城后的晚餐】\u003c/span\u003e","children":[{"id":"zMr8rfnrxq","text":"\u003cspan\u003e可以接着吃第一天没吃到的：斯丹姜母鸭 / 牛肉火锅，或者尝试\u003c/span\u003e\u003cspan class=\"bold\"\u003e四果汤\u003c/span\u003e\u003cspan\u003e（阿达子、石花膏，消暑）。\u003c/span\u003e"},{"id":"tCxE4Engfw","text":"\u003cspan\u003e斯丹姜母鸭（涂门街店，3 人点一只）\u003c/span\u003e"},{"id":"MkmGoGxPNV","text":"\u003cspan\u003e夜宵备选：水门国仔面线糊 + 醋肉\u003c/span\u003e"},{"id":"lsKY10jbdN","text":"\u003cspan\u003e晚餐推荐：阿秋牛排，卤牛排 + 咸饭 + 牛肉羹。\u003c/span\u003e"},{"id":"HR02gnw5YX","text":""}]}]},{"id":"TaUFPN1bU9","text":"\u003cspan\u003eDay3 蟳埔附近美食\u003c/span\u003e","children":[{"id":"aFeuysibR7","text":"\u003cspan\u003e1. \u003c/span\u003e\u003cspan class=\"bold\"\u003e蟳埔阿芳卤面\u003c/span\u003e\u003cspan\u003e（蟳埔村口老店）\u003c/span\u003e","children":[{"id":"VTcS3d0JXZ","text":"\u003cspan\u003e特色：闽南卤面，海鲜卤汁，加海蛎、虾仁、瘦肉，浓稠鲜香，本地老字号。\u003c/span\u003e"},{"id":"WrIswark1i","text":"\u003cspan\u003e理由：离蟳埔村很近，拍完照直接吃，性价比高。\u003c/span\u003e"}]},{"id":"7bFiNCaPuV","text":"\u003cspan\u003e2. 海蛎煎：村口小摊，现煎，配甜辣酱，可以尝一份。\u003c/span\u003e"},{"id":"KSULbLYlk9","text":"\u003cspan\u003e3.&nbsp;润饼\u003c/span\u003e"}]}]},{"id":"OOlDIdgmoJ","text":""}]}</script>
+  <script>
+(function () {
+  const doc = JSON.parse(document.getElementById("doc-data").textContent);
+  const root = document.getElementById("tree");
+
+  function hasChildren(node) {
+    return Array.isArray(node.children) && node.children.length > 0;
+  }
+
+  function isBlankText(node) {
+    const t = (node.text || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim();
+    return !t;
+  }
+
+  function createNode(node, level) {
+    const li = document.createElement("li");
+    li.className = "node";
+    li.dataset.level = String(level);
+    li.dataset.id = node.id || "";
+    if (node.collapsed) li.dataset.mubuCollapsed = "1";
+    else li.dataset.mubuCollapsed = "0";
+
+    const blank = isBlankText(node);
+    const kids = hasChildren(node);
+
+    if (blank && !kids) {
+      li.classList.add("is-empty-leaf");
+      return li;
+    }
+
+    // Flatten blank parents: insert children at this level
+    if (blank && kids) {
+      const frag = document.createDocumentFragment();
+      node.children.forEach(function (child) {
+        frag.appendChild(createNode(child, level));
+      });
+      return frag;
+    }
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "toggle" + (kids ? "" : " leaf");
+    toggle.setAttribute("aria-label", kids ? "展开或折叠" : "");
+    toggle.textContent = kids ? "−" : "·";
+    row.appendChild(toggle);
+
+    const content = document.createElement("div");
+    content.className = "content";
+    content.innerHTML = node.text || "";
+    if (node.note) {
+      const note = document.createElement("div");
+      note.className = "note";
+      note.innerHTML = node.note;
+      content.appendChild(note);
+    }
+    row.appendChild(content);
+    li.appendChild(row);
+
+    if (kids) {
+      const ul = document.createElement("ul");
+      node.children.forEach(function (child) {
+        ul.appendChild(createNode(child, level + 1));
+      });
+      li.appendChild(ul);
+      toggle.addEventListener("click", function () {
+        li.classList.toggle("collapsed");
+        toggle.textContent = li.classList.contains("collapsed") ? "+" : "−";
+      });
+    }
+
+    return li;
+  }
+
+  function setToggleGlyph(li) {
+    const toggle = li.querySelector(":scope > .row > .toggle");
+    if (!toggle || toggle.classList.contains("leaf")) return;
+    toggle.textContent = li.classList.contains("collapsed") ? "+" : "−";
+  }
+
+  function allNodes() {
+    return Array.from(root.querySelectorAll("li.node"));
+  }
+
+  function expandAll() {
+    allNodes().forEach(function (li) {
+      li.classList.remove("collapsed");
+      setToggleGlyph(li);
+    });
+  }
+
+  function collapseAll() {
+    allNodes().forEach(function (li) {
+      if (li.querySelector(":scope > ul")) {
+        li.classList.add("collapsed");
+        setToggleGlyph(li);
+      }
+    });
+  }
+
+  function expandToLevel(maxLevel) {
+    allNodes().forEach(function (li) {
+      const level = Number(li.dataset.level || 0);
+      const hasUl = !!li.querySelector(":scope > ul");
+      if (!hasUl) return;
+      if (level < maxLevel) {
+        li.classList.remove("collapsed");
+      } else {
+        li.classList.add("collapsed");
+      }
+      setToggleGlyph(li);
+    });
+  }
+
+  function restoreMubuDefault() {
+    allNodes().forEach(function (li) {
+      const hasUl = !!li.querySelector(":scope > ul");
+      if (!hasUl) return;
+      if (li.dataset.mubuCollapsed === "1") li.classList.add("collapsed");
+      else li.classList.remove("collapsed");
+      setToggleGlyph(li);
+    });
+  }
+
+  (doc.nodes || []).forEach(function (node) {
+    root.appendChild(createNode(node, 0));
+  });
+
+  // Default: 只看一级 (level-0 open, deeper collapsed)
+  expandToLevel(1);
+
+  document.querySelector(".toolbar").addEventListener("click", function (e) {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === "expand-all") expandAll();
+    else if (action === "collapse-all") collapseAll();
+    else if (action === "level-1") expandToLevel(1);
+    else if (action === "level-2") expandToLevel(2);
+    else if (action === "mubu-default") restoreMubuDefault();
+  });
+})();
+  </script>
+</body>
+</html>
